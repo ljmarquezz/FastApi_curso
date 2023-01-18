@@ -1,2 +1,2 @@
 # FastApi_curso
-Curso de FastApi con Platzi
+Curso de FastApi con Platzi desde mi PC
