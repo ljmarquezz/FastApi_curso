@@ -2,10 +2,43 @@ from fastapi import FastAPI, Body, Path, Query
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 from typing import Optional, List
+from jwt_manager import create_token
 
 app = FastAPI()
 app.title = 'Learning FastAPI'
 app.version = '0.0.1'
+
+class User(BaseModel):
+    email:str
+    password:str
+
+    class Config:
+        schema_extra = {
+            'example': {
+                'email':'example@email.com',
+                'password':'your password'
+            }
+        }
+
+class Movie(BaseModel):
+    id: Optional[int]=None
+    tittle: str = Field(max_length=50, min_length=5)
+    overview: str = Field(min_length=10)
+    year: int = Field(le=2023)
+    rating: float = Field(ge=1,le=10.0)
+    category: str = Field(max_length=20)
+
+    class Config:
+        schema_extra = {
+            'example': {
+                'id':1,
+                'tittle': 'Titulo de la pelicula',
+                'overview': 'Sinopsis de la pelicula',
+                'year':2023,
+                'rating': 5.0,
+                'category': 'Categoria de la pelicula'
+            }
+        }
 
 movies = [
     {
@@ -34,29 +67,13 @@ movies = [
     }
 ]
 
-class Movie(BaseModel):
-    id: Optional[int]=None
-    tittle: str = Field(max_length=50, min_length=5)
-    overview: str = Field(min_length=10)
-    year: int = Field(le=2023)
-    rating: float = Field(ge=1,le=10.0)
-    category: str = Field(max_length=20)
-
-    class Config:
-        schema_extra = {
-            'example': {
-                'id':1,
-                'tittle': 'Titulo de la pelicula',
-                'overview': 'Sinopsis de la pelicula',
-                'year':2023,
-                'rating': 5.0,
-                'category': 'Categoria de la pelicula'
-            }
-        }
-
 @app.get('/', tags=['home'])
 def message():
     return HTMLResponse('<h1>HOLA</h1>')
+
+@app.post('/login', tags=['auth'])
+def login(user: User):
+    return user
 
 @app.get('/movies', tags=['movies'], response_model=List[Movie])
 def get_movies() -> List[Movie]:
