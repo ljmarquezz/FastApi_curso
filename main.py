@@ -71,12 +71,11 @@ def get_movie(id:int = Path(ge=1)):
 
 @app.get('/movies/', tags=['movies'])
 def get_movie_by_category(category:str = Query(min_length=5, max_length=20)):
-    res = list(filter(lambda item:item['category']==category, movies))
-    return res
+    return list(filter(lambda item:item['category']==category, movies))
 
 @app.post('/movies', tags=["movies"])
 def create_movie(movie:Movie):
-    movies.append(movie)
+    movies.append(dict(movie))
     return movies
 
 @app.put("/movies/{id}", tags=["movies"])
