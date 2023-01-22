@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Body
 from fastapi.responses import HTMLResponse
+from pydantic import BaseModel
+from typing import Optional
 
 app = FastAPI()
 app.title = 'Learning FastAPI'
@@ -24,6 +26,14 @@ movies = [
     }
 ]
 
+class Movie(BaseModel):
+    id: Optional[int]=None
+    tittle: str
+    overview: str
+    year: int
+    rating: float
+    category: str
+
 @app.get('/', tags=['home'])
 def message():
     return HTMLResponse('<h1>HOLA</h1>')
@@ -44,28 +54,19 @@ def get_movie_by_category(category:str):
     return [item for item in movies if item["category"] == category]
 
 @app.post('/movies', tags=["movies"])
-def create_movie(id:int=Body(), tittle:str=Body(), overview:str=Body(), year:int=Body(), rating:float=Body(), category:str=Body()):
-    movies.append(
-        {
-            'id':id,
-        'tittle': tittle,
-        'overview': overview,
-        'year': year,
-        'rating': rating,
-        'category': category
-        }
-    )
+def create_movie(movie:Movie):
+    movies.append(movie)
     return movies
 
 @app.put("/movies/{id}", tags=["movies"])
-def update_movie(id:int, tittle:str=Body(), overview:str=Body(), year:int=Body(), rating:float=Body(), category:str=Body()):
+def update_movie(id:int, movie:Movie):
     for item in movies:
         if item['id'] == id:
-            item['tittle'] = tittle
-            item['overview'] = overview
-            item['year'] = year
-            item['rating'] = rating
-            item['category'] = category
+            item['tittle'] = movie.tittle
+            item['overview'] = movie.overview
+            item['year'] = movie.year
+            item['rating'] = movie.rating
+            item['category'] = movie.category
             return item
     return []
 
