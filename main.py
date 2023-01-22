@@ -1,8 +1,9 @@
-from fastapi import FastAPI, Body, Path, Query
+from fastapi import FastAPI, Body, Path, Query, Request, HTTPException, Depends
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 from typing import Optional, List
-from jwt_manager import create_token
+from jwt_manager import create_token, validate_token
+from fastapi.security import HTTPBearer
 
 app = FastAPI()
 app.title = 'Learning FastAPI'
@@ -19,6 +20,14 @@ class User(BaseModel):
                 'password':'your password'
             }
         }
+
+class JWTBearer(HTTPBearer):
+    async def __call__(self, request: Request):
+        auth = await super().__call__(request)
+        data = validate_token(auth.credentials)
+        if data['email'] != 'admin@gmail.com' or data['password'] != 'admin':
+            raise HTTPException(status_code=403, detail='Credenciales invalidas')
+
 
 class Movie(BaseModel):
     id: Optional[int]=None
@@ -94,12 +103,12 @@ def get_movie_by_category(category:str = Query(min_length=5, max_length=20)) -> 
     res = list(filter(lambda item:item['category']==category, movies))
     return JSONResponse(content=res)
 
-@app.post('/movies', tags=["movies"], response_model=dict)
+@app.post('/movies', tags=["movies"], response_model=dict, dependencies=[Depends(JWTBearer())])
 def create_movie(movie:Movie) -> dict:
     movies.append(dict(movie))
     return JSONResponse(content={'message':'Se ha registrado la pelicula'})
 
-@app.put("/movies/{id}", tags=["movies"], response_model=dict)
+@app.put("/movies/{id}", tags=["movies"], response_model=dict, dependencies=[Depends(JWTBearer())])
 def update_movie(id:int, movie:Movie) -> dict:
     for item in movies:
         if item['id'] == id:
@@ -111,7 +120,7 @@ def update_movie(id:int, movie:Movie) -> dict:
             return JSONResponse(content={'message':'Pelicula actualizada'})
     return JSONResponse(status_code=404, content=[])
 
-@app.delete("/movies/{id}", tags=["movies"], response_model=dict)
+@app.delete("/movies/{id}", tags=["movies"], response_model=dict, dependencies=[Depends(JWTBearer())])
 def delete_movie(id:int) -> dict:
     for item in movies:
         if item['id'] == id:
