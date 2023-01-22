@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, Path, Query
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 from typing import Optional
@@ -23,6 +23,14 @@ movies = [
         'year': 2022,
         'rating': 7.9,
         'category': 'animacion'
+    },
+    {
+        'id':3,
+        'tittle': 'Iron Man',
+        'overview': 'Un multimillonario se hace una armadura y decide luchar contra el crimen en el mundo',
+        'year': 2008,
+        'rating': 8.5,
+        'category': 'accion'
     }
 ]
 
@@ -31,8 +39,8 @@ class Movie(BaseModel):
     tittle: str = Field(max_length=50, min_length=5)
     overview: str = Field(min_length=10)
     year: int = Field(le=2023)
-    rating: float = Field(le=10.0)
-    category: str
+    rating: float = Field(ge=1,le=10.0)
+    category: str = Field(max_length=20)
 
     class Config:
         schema_extra = {
@@ -55,15 +63,16 @@ def get_movies():
     return movies
 
 @app.get('/movies/{id}', tags=['movies'])
-def get_movie(id:int):
+def get_movie(id:int = Path(ge=1)):
     for item in movies:
         if item['id'] == id:
             return item
     return []
 
 @app.get('/movies/', tags=['movies'])
-def get_movie_by_category(category:str):
-    return [item for item in movies if item["category"] == category]
+def get_movie_by_category(category:str = Query(min_length=5, max_length=20)):
+    res = list(filter(lambda item:item['category']==category, movies))
+    return res
 
 @app.post('/movies', tags=["movies"])
 def create_movie(movie:Movie):
