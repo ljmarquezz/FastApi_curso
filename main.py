@@ -91,7 +91,6 @@ def update_movie(id:int, movie:Movie) -> dict:
             return JSONResponse(content={'message':'Pelicula actualizada'})
     return JSONResponse(status_code=404, content=[])
 
-
 @app.delete("/movies/{id}", tags=["movies"], response_model=dict)
 def delete_movie(id:int) -> dict:
     for item in movies:
