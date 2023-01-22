@@ -67,7 +67,7 @@ def get_movie(id:int = Path(ge=1)) -> Movie:
     for item in movies:
         if item['id'] == id:
             return JSONResponse(content=item)
-    return JSONResponse(content=[])
+    return JSONResponse(status_code=404, content=[])
 
 @app.get('/movies/', tags=['movies'], response_model=List[Movie])
 def get_movie_by_category(category:str = Query(min_length=5, max_length=20)) -> List[Movie]:
@@ -89,7 +89,7 @@ def update_movie(id:int, movie:Movie) -> dict:
             item['rating'] = movie.rating
             item['category'] = movie.category
             return JSONResponse(content={'message':'Pelicula actualizada'})
-    return JSONResponse(content=[])
+    return JSONResponse(status_code=404, content=[])
 
 
 @app.delete("/movies/{id}", tags=["movies"], response_model=dict)
@@ -98,4 +98,4 @@ def delete_movie(id:int) -> dict:
         if item['id'] == id:
             movies.remove(item)
             return JSONResponse(content={'message':'Se ha eliminado la pelicula'})
-    return JSONResponse(content=[])
+    return JSONResponse(status_code=404, content=[])
