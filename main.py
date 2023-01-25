@@ -54,33 +54,6 @@ class Movie(BaseModel):
             }
         }
 
-movies = [
-    {
-        'id':1,
-        'tittle': 'Spiderman',
-        'overview': 'Peter Parker fue mordido por una arana y ahora tiene superpoderes',
-        'year': 2017,
-        'rating': 7.2,
-        'category': 'accion'
-    },
-    {
-        'id':2,
-        'tittle': 'El gato con botas',
-        'overview': 'Antonio Banderas hace la voz de un gato muy mono',
-        'year': 2022,
-        'rating': 7.9,
-        'category': 'animacion'
-    },
-    {
-        'id':3,
-        'tittle': 'Iron Man',
-        'overview': 'Un multimillonario se hace una armadura y decide luchar contra el crimen en el mundo',
-        'year': 2008,
-        'rating': 8.5,
-        'category': 'accion'
-    }
-]
-
 @app.get('/', tags=['home'])
 def message():
     return HTMLResponse('<h1>HOLA</h1>')
