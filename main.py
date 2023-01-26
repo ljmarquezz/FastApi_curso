@@ -50,7 +50,7 @@ class Movie(BaseModel):
                 'overview': 'Sinopsis de la pelicula',
                 'year':2023,
                 'rating': 5.0,
-                'category': 'Categoria de la pelicula'
+                'category': 'Categoria'
             }
         }
 
