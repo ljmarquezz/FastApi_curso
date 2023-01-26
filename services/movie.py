@@ -45,5 +45,3 @@ class MovieService():
             return True
         else:
             return False
-
-
